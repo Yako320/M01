@@ -40,3 +40,15 @@ echo "Prefijo Correcto"
 echo "6. CHECK OK"
 echo "Enviando OK_FILENAME..."
 echo "OK_FILENAME" | nc localhost $PORT
+
+DATA=`nc -l $PORT`
+
+echo "9. RECIBO Y ALMACENAMIENTO DE DATOS"
+echo "Recibiendo Datos..."
+echo "$DATA" > ./server/dragon.txt
+
+echo "10. CHECK DATA"
+
+echo "13. RECIBO MD5"
+
+echo "14. CHECK MD5"

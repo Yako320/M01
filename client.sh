@@ -37,3 +37,14 @@ then
 fi
 
 echo "Prefijo Correcto"
+
+echo "8. ENVIO DEL CONTENIDO"
+cat /home/enti/projects/M01/client/dragon.txt | nc localhost $PORT
+
+DATA=`nc -l $PORT`
+
+echo "11. RECIBIR OK_DATA"
+
+echo "12. ENVIO MD5 DATOS"
+
+echo "15. FIN"
