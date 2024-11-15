@@ -8,6 +8,7 @@ echo "0. ESCUCHAMOS"
 
 DATA=`nc -l $PORT`
 
+echo "Comprobando Cabecera..."
 if [ "$DATA" != "DMAM2022" ]
 then
 	echo "ERROR 1: Cabecera Incorrecta"
@@ -23,7 +24,7 @@ echo "OK_HEADER" | nc localhost 2022
 
 echo "5. CHECK FILENAME"
 
-echo "Comprobando Prefijo"
+echo "Comprobando Prefijo..."
 DATA=`nc -l $PORT`
 
 PREFIX=`echo "$DATA" | cut -d ' ' -f1`
