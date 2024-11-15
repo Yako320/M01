@@ -6,6 +6,7 @@ echo "Cliente de Dragón Magia Abuelita Miedo 2022"
 
 echo "1. ENVÍO DE CABECERA"
 
+echo "Enviando Cabecera"
 echo "DMAM2022" | nc localhost $PORT
 
 DATA=`nc -l $PORT`
@@ -17,9 +18,22 @@ then
 	echo "ERROR 1: La Cabecera Se Envió Incorrectamente"
 	exit 1
 fi
+echo "Cabecera Correcta"
 
 echo "4. ENVIO NOMBRE DE ARCHIVO"
 
-echo "FILE_NAME dragon.txt" | nc localhost $PORT
+echo "Enviando nombre de archivo..."
+FILE_NAME="dragon.txt"
 
-nc -l $PORT
+echo "FILE_NAME $FILE_NAME" | nc localhost $PORT
+
+DATA=`nc -l $PORT`
+
+echo "7. COMPROBACION DE PREFIJO"
+if [ "$DATA" != "OK_FILENAME" ]
+then
+	echo "ERROR 2: El Prefijo Se Envio Incorrectamente"
+	exit 2
+fi
+
+echo "Prefijo Correcto"

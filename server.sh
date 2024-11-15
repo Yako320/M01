@@ -14,22 +14,28 @@ then
 	echo "KO_HEADER" | nc localhost 2022
 	exit 1
 fi
+echo "Cabecera Correcta"
 
-echo "2. CHECK OK - Enviando OK_HEADER"
+echo "2. CHECK OK"
+
+echo "Enviando Confirmacion"
 echo "OK_HEADER" | nc localhost 2022
 
 echo "5. CHECK FILENAME"
-FILENAME=`nc -l $PORT`
 
-PREFIJO=`echo "$FILENAME" | cut -d' ' -f1`
+echo "Comprobando Prefijo"
+DATA=`nc -l $PORT`
 
-if [ "$PREFIJO" != "FILE_NAME" ]
+PREFIX=`echo "$DATA" | cut -d ' ' -f1`
+
+if [ "$PREFIX" != "FILE_NAME" ]
 then
- 	echo "ERROR 1: Prefijo Incorrecto"
- 	echo "KO_FILENAME" | nc localhost 2022
- 	exit 1
+ 	echo "ERROR 2: Prefijo Incorrecto"
+ 	echo "KO_FILENAME" | nc localhost $PORT
+ 	exit 2
 fi
+echo "Prefijo Correcto"
 
-echo "6. CHECK OK - Enviando OK_FILENAME"
+echo "6. CHECK OK"
 echo "Enviando OK_FILENAME..."
-echo "OK_FILENAME" | nc localhost 2022
+echo "OK_FILENAME" | nc localhost $PORT
