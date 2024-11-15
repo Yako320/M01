@@ -39,7 +39,9 @@ fi
 echo "Prefijo Correcto"
 
 echo "8. ENVIO DEL CONTENIDO"
+echo "Enviando Contenido..."
 cat /home/enti/projects/M01/client/dragon.txt | nc localhost $PORT
+echo "Contenido Enviado"
 
 DATA=`nc -l $PORT`
 
