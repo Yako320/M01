@@ -1,57 +1,73 @@
-#!/bin/bash
+#0 "FILE_NAMEi/bin/bash
+
 
 PORT="2022"
 
 echo "Servidor de Dragón Magia Abuelita Miedo 2022"
 
 echo "0. ESCUCHAMOS"
-
 DATA=`nc -l $PORT`
-HEADER=`echo "$DATA" | cut -d " " -f 1`
-IP=`echo "$DATA" | cut -d " " -f 2`
 
-echo "Comprobando Cabecera..."
-if [ "$HEADER" != "DMAM2022" ]
+if [ "$DATA" != "DMAM" ]
 then
-	echo "ERROR 1: Cabecera Incorrecta"
-	echo "KO_HEADER" | nc $IP $PORT
+	echo "ERROR 1: Cabecera incorrecta"
+	echo "KO_HEADER" | nc localhost $PORT
 	exit 1
 fi
-echo "Cabecera Correcta"
 
-echo "La IP del cliente es: $IP"
+echo "2. CHECK OK - Enviando OK_HEADER"
+echo "OK_HEADER" | nc localhost $PORT
+DATA=`nc -l $PORT`
 
-echo "2. CHECK OK"
-
-echo "Enviando Confirmacion"
-echo "OK_HEADER" | nc $IP $PORT
-
-echo "5. CHECK FILENAME"
-
-echo "Comprobando Prefijo..."
-
-PREFIX=`nc -l $IP $PORT | cut -d ' ' -f 1`
+echo "5. COMPROBANDO PREFIJO"
+PREFIX=`echo "$DATA" | cut -d " " -f 1`
+NOMBRE_ARCHIVO=`echo "$DATA" | cut -d " " -f 2`
 
 if [ "$PREFIX" != "FILE_NAME" ]
 then
- 	echo "ERROR 2: Prefijo Incorrecto"
- 	echo "KO_FILENAME" | nc $IP $PORT
- 	exit 2
+	echo "ERROR 2: Prefijo  incorrecto"
+	echo "KO_FILE_NAME" | nc localhost $PORT
+	exit 2
 fi
-echo "Prefijo Correcto"
 
-echo "6. CHECK OK"
-echo "Enviando OK_FILENAME..."
-echo "OK_FILENAME" | nc $IP $PORT
-
+echo "6. ENVIANDO OK_FILE_NAME"
+echo "OK_FILE_NAME" | nc localhost $PORT
 DATA=`nc -l $PORT`
 
-echo "9. RECIBO Y ALMACENAMIENTO DE DATOS"
-echo "Recibiendo Datos..."
-echo "$DATA" > ./server/$NOMBRE
 
-echo "10. CHECK DATA"
+echo "8. RECIBIENDO Y ALMACENANDO DATOS"
+if [ "$DATA" == "" ]
+then
+	echo "ERROR 3: Datos incorrectos"
+	echo "KO_DATA" | nc localhost $PORT
+	exit 3
+fi
 
-echo "13. RECIBO MD5"
+echo "$DATA" > server/dragon.txt
 
-echo "14. CHECK MD5"
+echo "9. CHECK Y RESPUESTA"
+echo "OK_DATA"| nc localhost $PORT
+DATA=`nc -l $PORT`
+
+echo "12. RECIBIENDO MD5"
+PREFIX=`echo "$DATA" | cut -d " " -f 1`
+NOMBRE_ARCHIVO=`echo "$DATA" | cut -d " " -f 3`Z
+
+echo "13. CHECK MD5 - ENVIANDO OK_FILE_MD5"
+if [ "$PREFIX" != "FILE_MD5" ]
+then
+	echo "ERROR 4: Prefijo  incorrecto"
+	echo "KO_FILE_MD5" | nc localhost $PORT
+	exit 4
+fi
+
+COMPROBACION_MD5=$(md5sum server/$NOMBRE_ARCHIVO | awk '{ print $1 }')
+
+if [ "$COMPROBACION_MD5" != "$DATA" ]
+then
+    echo "ERROR 5: MD5 incorrecto"
+    echo "KO_FILE_MD5" | nc localhost $PORT
+    exit 5
+fi
+
+echo "OK_FILE_MD5"| nc localhost $PORT

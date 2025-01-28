@@ -1,63 +1,53 @@
-#!/bin/bash
+#1! /bin/bash
 
-if [ "$1" == "" ]
-then
-	echo "Debes indicar la direccion del servidor."
-	echo "Ejemplo:"
-	echo -e "\t$0 127.0.0.1"
-	exit 1
-fi
-
-IP_SERVER=$1
-
-IP_CLIENT=`ip a | grep "score global" | xargs | cut -d " " -f 2 | cut -d "/" -f 1`
 PORT="2022"
 
 echo "Cliente de Dragón Magia Abuelita Miedo 2022"
 
-echo "1. ENVÍO DE CABECERA"
-
-echo "Enviando Cabecera"
-echo "DMAM2022 $IP_CLIENT" | nc $IP_SERVER $PORT
-
+echo "1. ENVIO DE CABECERA"
+echo "DMAM" | nc localhost $PORT
 DATA=`nc -l $PORT`
 
-echo "3. COMPROBACION DE CABECERA"
-
+echo "3. COMPROBANDO HEADER"
 if [ "$DATA" != "OK_HEADER" ]
 then
-	echo "ERROR 1: La Cabecera Se Envió Incorrectamente"
+	echo "ERROR 1: El header se envió incorrectamente"
 	exit 1
 fi
-echo "Cabecera Correcta"
 
-echo "4. ENVIO NOMBRE DE ARCHIVO"
+echo "4. CHECK OK - Enviando FILE_NAME"
 
-echo "Enviando nombre de archivo..."
 FILE_NAME="dragon.txt"
-
-echo "FILE_NAME $FILE_NAME" | nc $IP_SERVER $PORT
-
+echo "FILE_NAME $FILE_NAME" | nc localhost $PORT
 DATA=`nc -l $PORT`
 
-echo "7. COMPROBACION DE PREFIJO"
-if [ "$DATA" != "OK_FILENAME" ]
+if [ "$DATA" != "OK_FILE_NAME" ]
 then
-	echo "ERROR 2: El Prefijo Se Envio Incorrectamente"
+	echo "ERROR 2: El prefijo se envió incorrectamente"
 	exit 2
 fi
 
-echo "Prefijo Correcto"
+echo "7. CHECK OK - Enviando contenido del archivo"
+cat client/$FILE_NAME | nc localhost $PORT
+DATA=`nc -l $PORT`
 
-echo "8. ENVIO DEL CONTENIDO"
-echo "Enviando Contenido..."
-cat /home/enti/projects/M01/client/dragon.txt | nc $IP_SERVER $PORT
-echo "Contenido Enviado"
+echo "10. COMPROBANDO RESPUESTA"
+if [ "$DATA" != "OK_DATA" ]
+then
+	echo "ERROR 3: Los datos se enviarón incorrectamente"
+ 	exit 3
+fi
+
+echo "11. ENVIANDO MD5"
+MD5=$(md5sum client/$FILE_NAME | awk '{ print $1 }')
+echo "FILE_MD5 $MD5" | nc localhost $PORT
 
 DATA=`nc -l $PORT`
 
-echo "11. RECIBIR OK_DATA"
+if [ "$DATA" != "KO_FILE_MD5" ]
+then
+    echo "ERROR 4: El MD5 se envió incorrectamente"
+    exit 4
+fi
 
-echo "12. ENVIO MD5 DATOS"
-
-echo "15. FIN"
+echo "14. FIN"
